@@ -1,0 +1,47 @@
+# .github/workflows/flyway-migrate.yml
+name: Database Migrations
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: card_management_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Flyway
+        run: |
+          wget -qO- https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/11.1.0/flyway-commandline-11.1.0-linux-x64.tar.gz | tar xvz
+          sudo ln -s `pwd`/flyway-11.1.0/flyway /usr/local/bin
+
+      - name: Run Migrations
+        run: |
+          flyway -url=jdbc:postgresql://localhost:5432/card_management_db \
+                 -user=postgres -password=postgres \
+                 -locations=filesystem:./migrations \
+                 migrate
+
+      - name: Validate
+        run: |
+          flyway -url=jdbc:postgresql://localhost:5432/card_management_db \
+                 -user=postgres -password=postgres \
+                 -locations=filesystem:./migrations \
+                 validate
+  ```
+
+
