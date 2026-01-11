@@ -57,49 +57,53 @@ Este repositorio contiene:
 
 ## 🏗️ Arquitectura
 
-### **Módulos del Sistema**┌─────────────────────────────────────────────────────┐
+### **Módulos del Sistema**
+
+```
+┌─────────────────────────────────────────────────────┐
 │       card-management-database (PostgreSQL)         │
 │                                                     │
-│  ┌─────────────────────────────────────────────┐   │
-│  │  Schema: public                             │   │
-│  │                                             │   │
-│  │  📊 TABLES (6):                            │   │
-│  │  ├── cards (V1)                            │   │
-│  │  ├── card_audit (V1)                       │   │
-│  │  ├── credit_limits (V2)                    │   │
-│  │  ├── credit_limit_history (V2)             │   │
-│  │  ├── state_transitions (V3)                │   │
-│  │  └── flyway_schema_history                 │   │
-│  │                                             │   │
-│  │  🔑 INDEXES (56):                          │   │
-│  │  ├── B-Tree indexes (54)                   │   │
-│  │  └── GIN full-text search (2)              │   │
-│  │                                             │   │
-│  │  🔗 FOREIGN KEYS (4):                      │   │
-│  │  ├── card_audit → cards                    │   │
-│  │  ├── credit_limits → cards                 │   │
-│  │  ├── credit_limit_history → credit_limits  │   │
-│  │  └── state_transitions → cards             │   │
-│  │                                             │   │
-│  │  ⚡ TRIGGERS (6):                          │   │
-│  │  ├── update_cards_updated_at               │   │
-│  │  ├── update_credit_limits_updated_at       │   │
-│  │  ├── calculate_available_credit            │   │
-│  │  ├── reset_daily_limit                     │   │
-│  │  ├── reset_monthly_limit                   │   │
-│  │  └── validate_state_transition             │   │
-│  │                                             │   │
-│  │  👁️ VIEWS (3):                             │   │
-│  │  ├── v_card_lifecycle_summary              │   │
-│  │  ├── v_recent_failed_transitions           │   │
-│  │  └── v_event_statistics                    │   │
-│  │                                             │   │
-│  │  🔧 FUNCTIONS (8):                         │   │
-│  │  ├── get_card_lifecycle_history()          │   │
-│  │  ├── count_transitions_by_period()         │   │
-│  │  └── ... (+ 6 trigger functions)           │   │
-│  └─────────────────────────────────────────────┘   │
+│  ┌─────────────────────────────────────────────┐    │
+│  │  Schema: public                             │    │
+│  │                                             │    │
+│  │  TABLES (6):                                │    │
+│  │  ├── cards (V1)                             │    │
+│  │  ├── card_audit (V1)                        │    │
+│  │  ├── credit_limits (V2)                     │    │
+│  │  ├── credit_limit_history (V2)              │    │
+│  │  ├── state_transitions (V3)                 │    │
+│  │  └── flyway_schema_history                  │    │
+│  │                                             │    │
+│  │  INDEXES (56):                              │    │
+│  │  ├── B-Tree indexes (54)                    │    │
+│  │  └── GIN full-text search (2)               │    │
+│  │                                             │    │
+│  │  FOREIGN KEYS (4):                          │    │
+│  │  ├── card_audit → cards                     │    │
+│  │  ├── credit_limits → cards                  │    │
+│  │  ├── credit_limit_history → credit_limits   │    │
+│  │  └── state_transitions → cards              │    │
+│  │                                             │    │
+│  │  TRIGGERS (6):                              │    │
+│  │  ├── update_cards_updated_at                │    │
+│  │  ├── update_credit_limits_updated_at        │    │
+│  │  ├── calculate_available_credit             │    │
+│  │  ├── reset_daily_limit                      │    │
+│  │  ├── reset_monthly_limit                    │    │
+│  │  └── validate_state_transition              │    │
+│  │                                             │    │
+│  │  ️ VIEWS (3):                                │    │
+│  │  ├── v_card_lifecycle_summary               │    │
+│  │  ├── v_recent_failed_transitions            │    │
+│  │  └── v_event_statistics                     │    │
+│  │                                             │    │
+│  │  FUNCTIONS (8):                             │    │
+│  │  ├── get_card_lifecycle_history()           │    │
+│  │  ├── count_transitions_by_period()          │    │
+│  │  └── ... (+ 6 trigger functions)            │    │
+│  └─────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────┘
+```
 
 ### **Relaciones entre Tablas**
 ```mermaiderDiagram
