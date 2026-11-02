@@ -42,6 +42,3 @@ jobs:
                  -user=postgres -password=postgres \
                  -locations=filesystem:./migrations \
                  validate
-  ```
-
-
