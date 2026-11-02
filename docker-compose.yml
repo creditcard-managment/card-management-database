@@ -4,14 +4,14 @@ services:
     container_name: card-db-postgres
     environment:
       POSTGRES_DB: card_management_db
-      POSTGRES_USER: card_user
-      POSTGRES_PASSWORD: card_pass
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U card_user -d card_management_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d card_management_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -40,8 +40,8 @@ services:
       - ./migrations:/flyway/sql:ro
     environment:
       FLYWAY_URL: jdbc:postgresql://postgres:5432/card_management_db
-      FLYWAY_USER: card_user
-      FLYWAY_PASSWORD: card_pass
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: postgres
       FLYWAY_SCHEMAS: public
       FLYWAY_BASELINE_ON_MIGRATE: "true"
     depends_on:
@@ -50,56 +50,6 @@ services:
     networks:
       - card-network
 
-  # ✅ KAFKA Y ZOOKEEPER
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    container_name: card-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-    networks:
-      - card-network
-
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    container_name: card-kafka
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-      - "29092:29092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    networks:
-      - card-network
-    healthcheck:
-      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-
-  # ✅ KAFKA UI (OPCIONAL - para visualizar topics)
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: card-kafka-ui
-    depends_on:
-      - kafka
-    ports:
-      - "8090:8080"
-    environment:
-      KAFKA_CLUSTERS_0_NAME: card-cluster
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
-      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
-    networks:
-      - card-network
 
 networks:
   card-network:
