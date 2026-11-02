@@ -15,6 +15,8 @@ DB_URL := jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)
 # Docker
 COMPOSE := docker-compose
 COMPOSE_FILE := docker-compose.yml
+# Red creada por docker compose: <proyecto>_<red>
+DOCKER_NETWORK := card-management-database_card-network
 
 # Flyway
 FLYWAY := flyway
@@ -129,7 +131,7 @@ info: ## Ver estado de las migraciones
 		$(FLYWAY) -url=$(DB_URL) -user=$(DB_USER) -password=$(DB_PASSWORD) \
 			-locations=$(FLYWAY_LOCATIONS) info; \
 	else \
-		docker run --rm --network card-network \
+		docker run --rm --network $(DOCKER_NETWORK) \
 			-v $(PWD)/migrations:/flyway/sql:ro \
 			flyway/flyway:11.1.0-alpine \
 			-url=jdbc:postgresql://postgres:5432/$(DB_NAME) \
@@ -143,7 +145,7 @@ validate: ## Validar migraciones
 		$(FLYWAY) -url=$(DB_URL) -user=$(DB_USER) -password=$(DB_PASSWORD) \
 			-locations=$(FLYWAY_LOCATIONS) validate; \
 	else \
-		docker run --rm --network card-network \
+		docker run --rm --network $(DOCKER_NETWORK) \
 			-v $(PWD)/migrations:/flyway/sql:ro \
 			flyway/flyway:11.1.0-alpine \
 			-url=jdbc:postgresql://postgres:5432/$(DB_NAME) \
@@ -158,7 +160,8 @@ repair: ## Reparar tabla de historial de Flyway
 		$(FLYWAY) -url=$(DB_URL) -user=$(DB_USER) -password=$(DB_PASSWORD) \
 			-locations=$(FLYWAY_LOCATIONS) repair; \
 	else \
-		docker run --rm --network card-network \
+		docker run --rm --network $(DOCKER_NETWORK) \
+			-v $(PWD)/migrations:/flyway/sql:ro \
 			flyway/flyway:11.1.0-alpine \
 			-url=jdbc:postgresql://postgres:5432/$(DB_NAME) \
 			-user=$(DB_USER) -password=$(DB_PASSWORD) repair; \
@@ -174,7 +177,7 @@ clean: ## Limpiar base de datos (⚠️  BORRA TODO)
 		if command -v $(FLYWAY) > /dev/null; then \
 			$(FLYWAY) -url=$(DB_URL) -user=$(DB_USER) -password=$(DB_PASSWORD) clean; \
 		else \
-			docker run --rm --network card-network \
+			docker run --rm --network $(DOCKER_NETWORK) \
 				flyway/flyway:11.1.0-alpine \
 				-url=jdbc:postgresql://postgres:5432/$(DB_NAME) \
 				-user=$(DB_USER) -password=$(DB_PASSWORD) clean; \
